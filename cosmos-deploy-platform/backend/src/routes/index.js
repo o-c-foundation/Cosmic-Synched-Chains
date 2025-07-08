@@ -8,6 +8,7 @@ const express = require('express');
 const networkRoutes = require('./networkRoutes');
 const authRoutes = require('./authRoutes');
 const healthRoutes = require('./healthRoutes');
+const staticRoutes = require('./staticRoutes');
 const { ResourceNotFoundError } = require('../middlewares/errorHandler');
 
 const router = express.Router();
@@ -33,6 +34,7 @@ router.get('/docs', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/networks', networkRoutes);
 router.use('/health', healthRoutes);
+router.use('/', staticRoutes);
 
 // Future route modules would be added here
 // router.use('/users', userRoutes);

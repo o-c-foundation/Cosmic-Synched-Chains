@@ -12,7 +12,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Button
+  Button,
+  Collapse
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -28,6 +29,16 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import DescriptionIcon from '@mui/icons-material/Description';
 import UpdateIcon from '@mui/icons-material/Update';
 import HomeIcon from '@mui/icons-material/Home';
+import HelpIcon from '@mui/icons-material/Help';
+import FeedbackIcon from '@mui/icons-material/Feedback';
+import GroupsIcon from '@mui/icons-material/Groups';
+import GavelIcon from '@mui/icons-material/Gavel';
+import PrivacyTipIcon from '@mui/icons-material/PrivacyTip';
+import CookieIcon from '@mui/icons-material/Cookie';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import InfoIcon from '@mui/icons-material/Info';
 
 const drawerWidth = 240;
 
@@ -51,6 +62,13 @@ const Layout = ({ children }) => {
     setMobileOpen(!mobileOpen);
   };
   
+  // State for collapsible menu items
+  const [openSubmenu, setOpenSubmenu] = useState('');
+
+  const handleSubmenuToggle = (menu) => {
+    setOpenSubmenu(openSubmenu === menu ? '' : menu);
+  };
+
   // Define menu items based on authentication state
   const protectedMenuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -67,6 +85,29 @@ const Layout = ({ children }) => {
     { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/pricing' },
     { text: 'Documentation', icon: <DescriptionIcon />, path: '/documentation' },
     { text: 'Changelog', icon: <UpdateIcon />, path: '/changelog' },
+    { 
+      text: 'Resources', 
+      icon: <InfoIcon />, 
+      submenu: true,
+      submenuItems: [
+        { text: 'About Us', icon: <InfoIcon />, path: '/about' },
+        { text: 'Help Center', icon: <HelpIcon />, path: '/help' },
+        { text: 'System Status', icon: <MonitorIcon />, path: '/status' },
+        { text: 'Community', icon: <GroupsIcon />, path: '/community' },
+        { text: 'Feedback', icon: <FeedbackIcon />, path: '/feedback' }
+      ]
+    },
+    { 
+      text: 'Legal', 
+      icon: <GavelIcon />, 
+      submenu: true,
+      submenuItems: [
+        { text: 'Terms of Service', icon: <GavelIcon />, path: '/terms' },
+        { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
+        { text: 'Cookie Policy', icon: <CookieIcon />, path: '/cookies' },
+        { text: 'Licenses', icon: <LibraryBooksIcon />, path: '/licenses' }
+      ]
+    }
   ];
   
   // Choose which menu items to display
@@ -112,42 +153,120 @@ const Layout = ({ children }) => {
      <Divider sx={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
       <List>
         {menuItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
-            onClick={() => navigate(item.path)}
-            selected={location.pathname === item.path}
-            sx={{
-              '&.Mui-selected': {
-                backgroundColor: 'rgba(204, 255, 0, 0.2)',
-                color: '#CCFF00',
-                textShadow: '0 0 8px rgba(0, 0, 0, 0.6)',
-                '& .MuiListItemIcon-root': {
-                  color: '#CCFF00',
-                },
-                borderLeft: '4px solid #CCFF00'
-              },
-              '&.Mui-selected:hover': {
-                backgroundColor: 'rgba(204, 255, 0, 0.3)',
-              },
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              },
-              borderRadius: '0 20px 20px 0',
-              marginRight: '8px',
-              marginY: '4px',
-              transition: 'all 0.3s ease',
-              color: 'white',
-              '& .MuiListItemIcon-root': {
-                color: 'rgba(255, 255, 255, 0.7)',
-              },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: '40px' }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
+          <React.Fragment key={item.text}>
+            {!item.submenu ? (
+              <ListItem 
+                button 
+                onClick={() => navigate(item.path)}
+                selected={location.pathname === item.path}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(204, 255, 0, 0.2)',
+                    color: '#CCFF00',
+                    textShadow: '0 0 8px rgba(0, 0, 0, 0.6)',
+                    '& .MuiListItemIcon-root': {
+                      color: '#CCFF00',
+                    },
+                    borderLeft: '4px solid #CCFF00'
+                  },
+                  '&.Mui-selected:hover': {
+                    backgroundColor: 'rgba(204, 255, 0, 0.3)',
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  },
+                  borderRadius: '0 20px 20px 0',
+                  marginRight: '8px',
+                  marginY: '4px',
+                  transition: 'all 0.3s ease',
+                  color: 'white',
+                  '& .MuiListItemIcon-root': {
+                    color: 'rgba(255, 255, 255, 0.7)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: '40px' }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ) : (
+              <>
+                <ListItem 
+                  button 
+                  onClick={() => handleSubmenuToggle(item.text)}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    },
+                    borderRadius: '0 20px 20px 0',
+                    marginRight: '8px',
+                    marginY: '4px',
+                    transition: 'all 0.3s ease',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'rgba(255, 255, 255, 0.7)',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: '40px' }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={item.text} />
+                  {openSubmenu === item.text ? <ExpandLess /> : <ExpandMore />}
+                </ListItem>
+                <Collapse in={openSubmenu === item.text} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {item.submenuItems.map((subItem) => (
+                      <ListItem
+                        key={subItem.text}
+                        button
+                        onClick={() => navigate(subItem.path)}
+                        selected={location.pathname === subItem.path}
+                        sx={{
+                          pl: 4,
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(204, 255, 0, 0.2)',
+                            color: '#CCFF00',
+                            textShadow: '0 0 8px rgba(0, 0, 0, 0.6)',
+                            '& .MuiListItemIcon-root': {
+                              color: '#CCFF00',
+                            },
+                            borderLeft: '4px solid #CCFF00'
+                          },
+                          '&.Mui-selected:hover': {
+                            backgroundColor: 'rgba(204, 255, 0, 0.3)',
+                          },
+                          '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                          },
+                          borderRadius: '0 20px 20px 0',
+                          marginRight: '8px',
+                          marginY: '2px',
+                          transition: 'all 0.3s ease',
+                          color: 'white',
+                          '& .MuiListItemIcon-root': {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                          },
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: '40px', fontSize: 'small' }}>
+                          {subItem.icon}
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={subItem.text} 
+                          primaryTypographyProps={{ 
+                            fontSize: '0.875rem',
+                            fontWeight: location.pathname === subItem.path ? 'medium' : 'normal'
+                          }} 
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              </>
+            )}
+          </React.Fragment>
         ))}
       </List>
     </div>

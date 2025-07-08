@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { authService } from '../services/api';
 
 // Create the auth context
 const AuthContext = createContext();
-
-// API base URL
-const API_URL = process.env.REACT_APP_API_URL || 'https://beta.syncron.network/api';
 
 // Auth provider component
 export const AuthProvider = ({ children }) => {
@@ -18,21 +15,37 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
       
-      if (token) {
+      // If we have both token and stored user data
+      if (token && storedUser) {
         try {
-          // Set default auth header for all requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          // Set the user from localStorage immediately for fast rendering
+          setCurrentUser(JSON.parse(storedUser));
           
-          // Fetch current user
-          const response = await axios.get(`${API_URL}/auth/me`);
+          // Then verify with the server in the background
+          const response = await authService.getCurrentUser();
+          // Update with fresh data from server
           setCurrentUser(response.data.user);
         } catch (err) {
           console.error('Auth check failed:', err);
           // Clear invalid token
           localStorage.removeItem('token');
-          delete axios.defaults.headers.common['Authorization'];
+          localStorage.removeItem('user');
+          setCurrentUser(null);
         }
+      } else if (token) {
+        // If we have token but no user data
+        try {
+          const response = await authService.getCurrentUser();
+          setCurrentUser(response.data.user);
+        } catch (err) {
+          console.error('Auth check failed:', err);
+          localStorage.removeItem('token');
+        }
+      } else if (storedUser) {
+        // If we have user data but no token, clear it
+        localStorage.removeItem('user');
       }
       
       setLoading(false);
@@ -48,14 +61,8 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-      const { token, user } = response.data;
-      
-      // Save token to local storage
-      localStorage.setItem('token', token);
-      
-      // Set auth header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await authService.login(email, password);
+      const { user } = response;
       
       // Update state
       setCurrentUser(user);
@@ -76,14 +83,8 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
-      const { token, user } = response.data;
-      
-      // Save token to local storage
-      localStorage.setItem('token', token);
-      
-      // Set auth header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await authService.register(userData);
+      const { user } = response;
       
       // Update state
       setCurrentUser(user);
@@ -99,15 +100,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    // Clear token from storage
-    localStorage.removeItem('token');
-    
-    // Clear auth header
-    delete axios.defaults.headers.common['Authorization'];
-    
-    // Reset state
-    setCurrentUser(null);
+  const logout = async () => {
+    try {
+      // Call logout API
+      await authService.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      // Reset state regardless of API success
+      setCurrentUser(null);
+    }
   };
 
   // Context value

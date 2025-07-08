@@ -1,0 +1,223 @@
+/**
+ * Theme Overrides
+ * 
+ * Force consistent styling across all components with black backgrounds
+ * and neon green (#CCFF00) accents
+ *
+ * IMPORTANT: Ensuring text contrast for professional appearance
+ */
+
+/* Override blue headers with black backgrounds and green accents */
+.documentation-header,
+.changelog-header,
+.settings-header,
+.MuiAppBar-root,
+.blue-section {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Override blue accents with green */
+.MuiButton-containedPrimary,
+.primary-button,
+.accent-color,
+.tag-accent,
+.recommended-tag,
+.highlight-text,
+.accent-border,
+.feature-icon,
+.MuiSwitch-colorPrimary.Mui-checked,
+.blue-text,
+.primary-text {
+  background-color: #CCFF00 !important;
+  color: #000000 !important;
+  border-color: #CCFF00 !important;
+}
+
+/* Text accent color */
+.text-accent,
+.green-text,
+.link-color,
+a:not(.MuiButton-root),
+.active-link,
+.feature-title,
+.tier-title,
+.MuiCheckbox-colorPrimary.Mui-checked {
+  color: #CCFF00 !important;
+}
+
+/* White backgrounds to black with white text for contrast */
+.white-section,
+.MuiPaper-root,
+.white-bg,
+.card-bg,
+.form-bg,
+.settings-section,
+.content-section,
+.wizard-step,
+.wizard-bg {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Secondary backgrounds slightly lighter with white text for contrast */
+.secondary-bg,
+.MuiDialogContent-root,
+.MuiTableCell-root,
+.sidebar-bg,
+.sidebar-item {
+  background-color: #111111 !important;
+  color: #FFFFFF !important;
+}
+
+/* Force text contrast for key elements */
+.MuiTypography-root,
+.text-content,
+p,
+span:not(.icon-span),
+.text-block,
+.MuiListItemText-primary,
+.MuiListItemText-secondary {
+  color: #FFFFFF !important;
+}
+
+/* Labels should be visible */
+label,
+.MuiFormLabel-root,
+.input-label,
+.form-label {
+  color: #CCCCCC !important;
+}
+
+/* Override white cards with black background cards with green borders */
+.card,
+.MuiCard-root,
+.pricing-card,
+.feature-card,
+.info-card,
+.MuiPaper-elevation1 {
+  background-color: #111111 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #333333 !important;
+}
+
+.card:hover,
+.MuiCard-root:hover,
+.pricing-card:hover,
+.feature-card:hover,
+.info-card:hover,
+.MuiPaper-elevation1:hover {
+  border-color: #CCFF00 !important;
+}
+
+/* Form input fields */
+input,
+.MuiInputBase-root,
+.MuiOutlinedInput-root,
+.MuiFilledInput-root,
+textarea,
+select {
+  background-color: #111111 !important;
+  color: #FFFFFF !important;
+  border-color: #333333 !important;
+}
+
+input:focus,
+.MuiInputBase-root:focus,
+.MuiOutlinedInput-root.Mui-focused,
+.MuiFilledInput-root.Mui-focused,
+textarea:focus,
+select:focus {
+  border-color: #CCFF00 !important;
+}
+
+/* Buttons styled with green accent */
+.MuiButton-outlined,
+.secondary-button {
+  border: 1px solid #CCFF00 !important;
+  color: #CCFF00 !important;
+}
+
+/* Special treatment for icons */
+.MuiSvgIcon-colorPrimary,
+.primary-icon,
+.accent-icon {
+  color: #CCFF00 !important;
+}
+
+/* Documentation blue header override */
+.documentation-container header,
+.changelog-container header {
+  background-color: #000000 !important;
+}
+
+/* Documentation search bar */
+.search-container input {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* Override wizard steps with dark theme */
+.step-indicator.active {
+  background-color: #CCFF00 !important;
+  color: #000000 !important;
+}
+
+.step-indicator {
+  background-color: #333333 !important;
+  color: #FFFFFF !important;
+}
+
+/* Footer links */
+footer a {
+  color: #CCFF00 !important;
+}
+
+/* Green checkmarks */
+.checkmark,
+.feature-available,
+.MuiCheckIcon-root {
+  color: #CCFF00 !important;
+}
+
+/* Override any remaining blue buttons */
+button.blue-button,
+.blue-bg {
+  background-color: #CCFF00 !important;
+  color: #000000 !important;
+}
+
+/* Progress bars */
+.MuiLinearProgress-barColorPrimary,
+.progress-indicator {
+  background-color: #CCFF00 !important;
+}
+
+/* Focus and selection styles */
+:focus {
+  outline-color: #CCFF00 !important;
+}
+
+::selection {
+  background-color: #CCFF00 !important;
+  color: #000000 !important;
+}
+
+/* Alert and notification styling */
+.MuiAlert-standardSuccess {
+  background-color: rgba(204, 255, 0, 0.2) !important;
+  color: #CCFF00 !important;
+}
+
+/* Tables */
+table thead th {
+  color: #CCFF00 !important;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #111111 !important;
+}
+
+table tbody tr:hover {
+  background-color: #222222 !important;
+}

@@ -80,7 +80,7 @@ UserSchema.methods.getSignedJwtToken = function() {
   return jwt.sign(
     { id: this._id, role: this.role },
     config.jwtSecret,
-    { expiresIn: config.jwtExpire }
+    { expiresIn: config.jwtExpiresIn }
   );
 };
 

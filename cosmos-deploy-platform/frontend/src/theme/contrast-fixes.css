@@ -1,0 +1,236 @@
+/**
+ * Professional Contrast Fixes
+ * 
+ * This file contains specific contrast fixes to ensure all text
+ * is readable against its background for a professional UI appearance
+ */
+
+/* Text colors for dark backgrounds */
+body, p, h1, h2, h3, h4, h5, h6, span, div {
+  color: #FFFFFF;
+}
+
+/* Ensure proper contrast for tables */
+table {
+  border-collapse: collapse;
+}
+
+table th {
+  color: #CCFF00;
+  background-color: #111111;
+  font-weight: 600;
+}
+
+table td {
+  color: #FFFFFF;
+}
+
+/* Documentation page specific fixes */
+.documentation-container {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+.documentation-container .search-container input {
+  background-color: #111111;
+  color: #FFFFFF;
+  border: 1px solid #333333;
+}
+
+.documentation-container .category-title {
+  color: #CCFF00;
+}
+
+/* Form elements with proper contrast */
+input::placeholder, 
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+select option {
+  background-color: #111111;
+  color: #FFFFFF;
+}
+
+/* Pricing page specific fixes */
+.pricing-container .pricing-tier h3 {
+  color: #CCFF00;
+}
+
+.pricing-container .price {
+  color: #FFFFFF;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.pricing-container .feature-list li {
+  color: #FFFFFF;
+}
+
+/* Network creation wizard specific fixes */
+.create-network-wizard .step-title {
+  color: #CCFF00;
+}
+
+.create-network-wizard .step-description {
+  color: #CCCCCC;
+}
+
+.create-network-wizard .form-group label {
+  color: #FFFFFF;
+}
+
+/* Settings page specific fixes */
+.settings-page .settings-title {
+  color: #CCFF00;
+}
+
+.settings-page .settings-description {
+  color: #CCCCCC;
+}
+
+/* Dialog/modal specific fixes */
+.MuiDialog-paper {
+  background-color: #111111 !important;
+}
+
+.MuiDialog-paper .MuiDialogTitle-root {
+  color: #CCFF00 !important;
+}
+
+.MuiDialog-paper .MuiDialogContentText-root {
+  color: #FFFFFF !important;
+}
+
+/* Tooltips */
+.MuiTooltip-tooltip {
+  background-color: #333333 !important;
+  color: #FFFFFF !important;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  background-color: #111111;
+  border: 1px solid #333333;
+}
+
+.dashboard-card .card-title {
+  color: #CCFF00;
+}
+
+.dashboard-card .card-content {
+  color: #FFFFFF;
+}
+
+/* API documentation specific */
+.api-section code {
+  background-color: #222222;
+  color: #CCFF00;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.api-section pre {
+  background-color: #111111;
+  color: #FFFFFF;
+  padding: 16px;
+  border-radius: 4px;
+  border-left: 4px solid #CCFF00;
+}
+
+/* Navigation elements */
+.MuiBreadcrumbs-root {
+  color: #CCCCCC !important;
+}
+
+.MuiBreadcrumbs-separator {
+  color: #666666 !important;
+}
+
+.MuiBreadcrumbs-root .MuiBreadcrumbs-li a {
+  color: #CCFF00 !important;
+}
+
+/* Footer text */
+footer, .footer, .site-footer {
+  background-color: #000000 !important;
+  color: #CCCCCC !important;
+}
+
+/* Fix for landing page onboarding steps - force background to black */
+.landing-page, 
+.home-page, 
+.onboarding-section,
+.steps-section,
+.hero-section,
+.feature-section,
+.cta-section {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Force step numbers to be visible */
+.step-number, 
+.circle-number, 
+.numbered-step {
+  background-color: #CCFF00 !important;
+  color: #000000 !important;
+}
+
+/* Force step text to be visible */
+.step-text,
+.step-description,
+.onboarding-text,
+.feature-text {
+  color: #FFFFFF !important;
+}
+
+/* Force white backgrounds to black */
+.white-bg,
+.white-background,
+.bg-white,
+.background-white,
+[style*="background-color: white"],
+[style*="background-color: #fff"],
+[style*="background-color: #ffffff"],
+[style*="background: white"],
+[style*="background: #fff"],
+[style*="background: #ffffff"] {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Fix for disabled elements */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: #222222 !important;
+  color: #777777 !important;
+  opacity: 0.7;
+}
+
+/* Material-UI specific fixes */
+.MuiPaper-root .MuiFormControlLabel-label,
+.MuiPaper-root .MuiInputLabel-root,
+.MuiPaper-root .MuiTypography-body1 {
+  color: #FFFFFF !important;
+}
+
+/* Checkbox and radio button labels */
+.MuiFormControlLabel-root .MuiTypography-body1 {
+  color: #FFFFFF !important;
+}
+
+/* Card content proper contrast */
+.MuiCardContent-root {
+  color: #FFFFFF !important;
+}
+
+.MuiCardHeader-title {
+  color: #CCFF00 !important;
+}
+
+.MuiCardHeader-subheader {
+  color: #CCCCCC !important;
+}

@@ -31,7 +31,7 @@ const LandingPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Hero Section with animated flowing lines background
+  // Hero Section
   const HeroSection = () => {
     const canvasRef = useRef(null);
     
@@ -42,11 +42,20 @@ const LandingPage = () => {
       const ctx = canvas.getContext('2d');
       let animationFrameId;
       
+      // Set canvas dimensions
+      const handleResize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.8; // 80% of window height
+        initLines();
+      };
+      
+      window.addEventListener('resize', handleResize);
+      handleResize();
+      
       // Line properties
       const lines = [];
       const numLines = 20;
       
-      // Initialize lines function - declared BEFORE handleResize to fix the reference error
       const initLines = () => {
         lines.length = 0; // Clear previous lines
         
@@ -62,16 +71,6 @@ const LandingPage = () => {
           });
         }
       };
-      
-      // Set canvas dimensions
-      const handleResize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight * 0.8; // 80% of window height
-        initLines();
-      };
-      
-      window.addEventListener('resize', handleResize);
-      handleResize();
       
       const render = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -124,124 +123,122 @@ const LandingPage = () => {
     `;
     
     return (
-      <Box
-        sx={{
-          backgroundColor: '#000000',
-          color: 'white',
-          pt: { xs: 8, md: 12 },
-          pb: { xs: 10, md: 16 },
-          position: 'relative',
-          overflow: 'hidden',
-          height: { xs: '80vh', md: '90vh' },
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+    <Box
+      sx={{
+        backgroundColor: '#000000',
+        color: 'white',
+        pt: { xs: 8, md: 12 },
+        pb: { xs: 10, md: 16 },
+        position: 'relative',
+        overflow: 'hidden',
+        height: { xs: '80vh', md: '90vh' },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* Canvas for animated flowing lines */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 0
         }}
-      >
-        {/* Canvas for animated flowing lines */}
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 0
-          }}
-        />
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center" justifyContent="center">
-            <Grid item xs={12} md={8} textAlign="center">
-              {/* Main title with letter hover animation */}
-              <Box
-                component="div"
+      />
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={4} alignItems="center" justifyContent="center">
+          <Grid item xs={12} md={8} textAlign="center">
+            {/* Main title with letter hover animation */}
+            <Box
+              component="div"
+              sx={{
+                position: 'relative',
+                zIndex: 2,
+                mb: 2,
+                '& .animatedLetter': {
+                  display: 'inline-block',
+                  color: '#CCFF00',
+                  fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                  fontWeight: 'bold',
+                  textShadow: '0 0 10px rgba(204, 255, 0, 0.3)',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    animation: `${letterHoverKeyframes} 0.5s ease`,
+                    textShadow: '0 0 15px rgba(204, 255, 0, 0.6)',
+                  }
+                }
+              }}
+            >
+              {/* Each letter is individually animated on hover */}
+              <span className="animatedLetter">C</span>
+              <span className="animatedLetter">o</span>
+              <span className="animatedLetter">s</span>
+              <span className="animatedLetter">m</span>
+              <span className="animatedLetter">i</span>
+              <span className="animatedLetter">c</span>
+              <span> </span>
+              <span className="animatedLetter">S</span>
+              <span className="animatedLetter">y</span>
+              <span className="animatedLetter">n</span>
+              <span className="animatedLetter">c</span>
+              <span className="animatedLetter">h</span>
+              <span className="animatedLetter">e</span>
+              <span className="animatedLetter">d</span>
+              <br />
+              <span className="animatedLetter">C</span>
+              <span className="animatedLetter">h</span>
+              <span className="animatedLetter">a</span>
+              <span className="animatedLetter">i</span>
+              <span className="animatedLetter">n</span>
+              <span className="animatedLetter">s</span>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+              <Button
+                variant="contained"
                 sx={{
+                  backgroundColor: '#CCFF00',
+                  color: 'black',
+                  fontSize: '1.2rem',
+                  py: 1.5,
+                  px: 4,
+                  borderRadius: 30,
+                  textTransform: 'none',
+                  fontWeight: 'bold',
                   position: 'relative',
-                  zIndex: 2,
-                  mb: 2,
-                  '& .animatedLetter': {
-                    display: 'inline-block',
-                    color: '#CCFF00',
-                    fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
-                    fontWeight: 'bold',
-                    textShadow: '0 0 10px rgba(204, 255, 0, 0.3)',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      animation: `${letterHoverKeyframes} 0.5s ease`,
-                      textShadow: '0 0 15px rgba(204, 255, 0, 0.6)',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '-100%',
+                    left: '-100%',
+                    width: '300%',
+                    height: '300%',
+                    background: 'radial-gradient(circle, rgba(204,255,0,0.3) 0%, rgba(0,0,0,0) 70%)',
+                    opacity: 0,
+                    transition: 'opacity 0.5s ease'
+                  },
+                  '&:hover': {
+                    backgroundColor: '#d4ff33',
+                    transform: 'scale(1.05)',
+                    '&::before': {
+                      opacity: 1
                     }
                   }
                 }}
               >
-                {/* Each letter is individually animated on hover */}
-                <span className="animatedLetter">C</span>
-                <span className="animatedLetter">o</span>
-                <span className="animatedLetter">s</span>
-                <span className="animatedLetter">m</span>
-                <span className="animatedLetter">i</span>
-                <span className="animatedLetter">c</span>
-                <span> </span>
-                <span className="animatedLetter">S</span>
-                <span className="animatedLetter">y</span>
-                <span className="animatedLetter">n</span>
-                <span className="animatedLetter">c</span>
-                <span className="animatedLetter">h</span>
-                <span className="animatedLetter">e</span>
-                <span className="animatedLetter">d</span>
-                <br />
-                <span className="animatedLetter">C</span>
-                <span className="animatedLetter">h</span>
-                <span className="animatedLetter">a</span>
-                <span className="animatedLetter">i</span>
-                <span className="animatedLetter">n</span>
-                <span className="animatedLetter">s</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-                <Button
-                  component={RouterLink}
-                  to="/login"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: '#CCFF00',
-                    color: 'black',
-                    fontSize: '1.2rem',
-                    py: 1.5,
-                    px: 4,
-                    borderRadius: 30,
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: '-100%',
-                      left: '-100%',
-                      width: '300%',
-                      height: '300%',
-                      background: 'radial-gradient(circle, rgba(204,255,0,0.3) 0%, rgba(0,0,0,0) 70%)',
-                      opacity: 0,
-                      transition: 'opacity 0.5s ease'
-                    },
-                    '&:hover': {
-                      backgroundColor: '#d4ff33',
-                      transform: 'scale(1.05)',
-                      '&::before': {
-                        opacity: 1
-                      }
-                    }
-                  }}
-                >
-                  Deploy your Blockchain in minutes
-                </Button>
-              </Box>
-            </Grid>
+                Deploy your Blockchain in minutes
+              </Button>
+            </Box>
           </Grid>
-        </Container>
-      </Box>
-    );
-  };
+        </Grid>
+      </Container>
+    </Box>
+  );
+
 
   // Features Section
   const FeaturesSection = () => (
@@ -315,7 +312,8 @@ const LandingPage = () => {
       }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{
-            color: color,
+            color: color === '#CCFF00' ? color : color,
+            textShadow: color === '#CCFF00' ? '0 0 8px rgba(0, 0, 0, 0.5)' : 'none',
             mb: 2,
             animation: 'iconPulse 3s infinite alternate ease-in-out',
             '@keyframes iconPulse': {
@@ -576,80 +574,94 @@ const LandingPage = () => {
         {features.map((feature, index) => (
           <ListItem key={index} disableGutters>
             <ListItemIcon sx={{ minWidth: 40 }}>
-              <CheckCircleIcon color="primary" />
+              <CheckCircleIcon color={highlighted ? 'primary' : 'success'} />
             </ListItemIcon>
             <ListItemText primary={feature} />
           </ListItem>
         ))}
       </List>
 
-      <Button
-        component={RouterLink}
-        to={buttonLink}
-        variant={highlighted ? "contained" : "outlined"}
-        color="primary"
-        fullWidth
-        size="large"
-        sx={{ mt: 2 }}
-      >
-        {buttonText}
-      </Button>
+      <Box sx={{ mt: 'auto' }}>
+        <Button
+          component={RouterLink}
+          to={buttonLink}
+          variant={highlighted ? 'contained' : 'outlined'}
+          color="primary"
+          fullWidth
+          sx={{ py: 1.5 }}
+        >
+          {buttonText}
+        </Button>
+      </Box>
     </Paper>
   );
 
   // Footer Section
   const FooterSection = () => (
-    <Box sx={{ 
-      bgcolor: '#1a1a1a', // Darker background for the footer
-      pt: 8, 
-      pb: 4,
-      color: '#ffffff', // White text for better visibility
-      borderTop: '1px solid rgba(204, 255, 0, 0.3)' // Subtle neon border
-    }}>
+    <Box
+      component="footer"
+      sx={{
+        py: 6,
+        backgroundColor: 'background.paper',
+        borderTop: '1px solid',
+        borderColor: 'divider',
+      }}
+    >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ color: '#CCFF00' }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Cosmic Synched Chains
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              The easiest way to launch and manage your own Cosmos blockchain network.
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              © {new Date().getFullYear()} Cosmic Synched Chains by Syncron Labs. All rights reserved.
+            </Typography>
+          </Grid>
+          <Grid item xs={6} sm={3} md={2}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Product
             </Typography>
-            <List dense>
+            <List dense disablePadding>
               <FooterLink to="/features">Features</FooterLink>
               <FooterLink to="/pricing">Pricing</FooterLink>
-              <FooterLink to="/roadmap">Roadmap</FooterLink>
-              <FooterLink to="/case-studies">Case Studies</FooterLink>
+              <FooterLink to="/documentation">Documentation</FooterLink>
+              <FooterLink to="/changelog">Changelog</FooterLink>
             </List>
           </Grid>
           <Grid item xs={6} sm={3} md={2}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ color: '#CCFF00' }}>
-              Resources
-            </Typography>
-            <List dense>
-              <FooterLink to="/docs">Documentation</FooterLink>
-              <FooterLink to="/help">Help Center</FooterLink>
-              <FooterLink to="/status">Status</FooterLink>
-              <FooterLink to="/about">About Us</FooterLink>
-            </List>
-          </Grid>
-          <Grid item xs={6} sm={3} md={2}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ color: '#CCFF00' }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Company
             </Typography>
-            <List dense>
+            <List dense disablePadding>
               <FooterLink to="/about">About Us</FooterLink>
               <FooterLink to="/contact">Contact</FooterLink>
               <FooterLink to="/careers">Careers</FooterLink>
-              <FooterLink to="/press">Press</FooterLink>
+              <FooterLink to="/blog">Blog</FooterLink>
             </List>
           </Grid>
           <Grid item xs={6} sm={3} md={2}>
-            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ color: '#CCFF00' }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Legal
             </Typography>
-            <List dense>
-              <FooterLink to="/terms">Terms of Service</FooterLink>
-              <FooterLink to="/privacy">Privacy Policy</FooterLink>
-              <FooterLink to="/cookies">Cookie Policy</FooterLink>
+            <List dense disablePadding>
+              <FooterLink to="/terms">Terms</FooterLink>
+              <FooterLink to="/privacy">Privacy</FooterLink>
+              <FooterLink to="/cookies">Cookies</FooterLink>
               <FooterLink to="/licenses">Licenses</FooterLink>
+            </List>
+          </Grid>
+          <Grid item xs={6} sm={3} md={2}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              Support
+            </Typography>
+            <List dense disablePadding>
+              <FooterLink to="/help">Help Center</FooterLink>
+              <FooterLink to="/status">Status</FooterLink>
+              <FooterLink to="/community">Community</FooterLink>
+              <FooterLink to="/feedback">Feedback</FooterLink>
             </List>
           </Grid>
         </Grid>
@@ -659,18 +671,18 @@ const LandingPage = () => {
 
   // Footer Link Component
   const FooterLink = ({ to, children }) => (
-    <ListItem disablePadding sx={{ mb: 0.5 }}>
+    <ListItem disablePadding sx={{ mb: 1 }}>
       <Button
         component={RouterLink}
         to={to}
         sx={{ 
-          color: '#cccccc', // Light gray color for better visibility on dark background
+          color: 'text.secondary',
           p: 0,
           justifyContent: 'flex-start',
           textAlign: 'left',
           textTransform: 'none',
           '&:hover': { 
-            color: '#CCFF00', // Neon green on hover
+            color: '#CCFF00',
             backgroundColor: 'transparent'
           }
         }}

@@ -15,6 +15,15 @@ import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import Documentation from './pages/Documentation';
 import Changelog from './pages/Changelog';
+import HelpCenter from './pages/HelpCenter';
+import Status from './pages/Status';
+import Community from './pages/Community';
+import Feedback from './pages/Feedback';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Cookies from './pages/Cookies';
+import Licenses from './pages/Licenses';
+import About from './pages/About';
 import { NetworkProvider } from './context/NetworkContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -75,6 +84,17 @@ const App = () => {
             <Route path="/pricing" element={<MarketingLayout><Pricing /></MarketingLayout>} />
             <Route path="/documentation" element={<MarketingLayout><Documentation /></MarketingLayout>} />
             <Route path="/changelog" element={<MarketingLayout><Changelog /></MarketingLayout>} />
+            
+            {/* Informational Pages */}
+            <Route path="/about" element={<MarketingLayout><About /></MarketingLayout>} />
+            <Route path="/help" element={<MarketingLayout><HelpCenter /></MarketingLayout>} />
+            <Route path="/status" element={<MarketingLayout><Status /></MarketingLayout>} />
+            <Route path="/community" element={<MarketingLayout><Community /></MarketingLayout>} />
+            <Route path="/feedback" element={<MarketingLayout><Feedback /></MarketingLayout>} />
+            <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
+            <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
+            <Route path="/cookies" element={<MarketingLayout><Cookies /></MarketingLayout>} />
+            <Route path="/licenses" element={<MarketingLayout><Licenses /></MarketingLayout>} />
             
             {/* Protected Routes */}
             
