@@ -24,7 +24,7 @@ import GovernanceForm from '../components/NetworkCreation/GovernanceForm';
 import ReviewForm from '../components/NetworkCreation/ReviewForm';
 
 // Step component placeholders if needed
-const PlaceholderForm = ({ title, onNext, onBack, formData, updateFormData }) => (
+const PlaceholderForm = ({ title, onNext, onBack, formData, setFormData }) => (
   <Card>
     <CardContent>
       <Typography variant="h6" gutterBottom>
@@ -57,13 +57,18 @@ const NetworkCreation = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
   
   // Form data state
   const [formData, setFormData] = useState({
     // Basic Info
     name: '',
-    chainId: '',
     description: '',
+    provider: '',
+    region: '',
+    nodeType: '',
+    diskSize: '',
+    advancedMode: false,
     
     // Token Economics
     tokenEconomics: {
@@ -72,66 +77,48 @@ const NetworkCreation = () => {
       decimals: 6,
       initialSupply: 100000000,
       maxSupply: null,
-      distribution: {
-        validators: 10,
-        community: 40,
-        foundation: 30,
-        airdrop: 20,
-      },
+      inflationRate: 7,
+      inflationRateChange: 0.13,
+      inflationMax: 20,
+      inflationMin: 2,
+      bondedRatioGoal: 67,
+      blocksPerYear: 6311520,
+      communityTax: 2,
+      validatorsAllocation: 40,
+      communityPoolAllocation: 30,
+      strategicReserveAllocation: 20,
+      airdropAllocation: 10
     },
     
-    // Validator Requirements
-    validatorRequirements: {
-      minStake: 1000,
+    // Validators
+    validators: {
+      count: 4,
+      blockTime: 5,
+      unbondingTime: 21,
       maxValidators: 100,
-      unbondingPeriod: 21,
+      maxEntries: 7,
+      historicalEntries: 10000,
+      customValidators: []
     },
     
     // Governance Settings
-    governanceSettings: {
+    governance: {
+      minDeposit: 10000,
+      maxDepositPeriod: 14,
       votingPeriod: 14,
       quorum: 33.4,
       threshold: 50,
       vetoThreshold: 33.4,
+      maxTitleLength: 140,
+      maxDescriptionLength: 10000,
+      enabledProposalTypes: ['text', 'parameter_change', 'community_pool_spend', 'software_upgrade', 'cancel_software_upgrade']
     },
     
     // Modules
-    modules: [
-      {
-        id: 'bank',
-        name: 'Bank',
-        enabled: true,
-        config: {},
-      },
-      {
-        id: 'staking',
-        name: 'Staking',
-        enabled: true,
-        config: {
-          minCommissionRate: 5,
-        },
-      },
-      {
-        id: 'gov',
-        name: 'Governance',
-        enabled: true,
-        config: {
-          minDeposit: 10000,
-        },
-      },
-      {
-        id: 'ibc',
-        name: 'IBC',
-        enabled: true,
-        config: {},
-      },
-      {
-        id: 'wasm',
-        name: 'CosmWasm',
-        enabled: false,
-        config: {},
-      }
-    ],
+    modules: {
+      enabled: ['bank', 'staking', 'distribution', 'gov', 'slashing', 'ibc', 'authz', 'feegrant'],
+      params: {}
+    }
   });
   
   // Steps configuration
@@ -162,20 +149,20 @@ const NetworkCreation = () => {
     }
   ];
   
-  // Handle form data updates
-  const updateFormData = (updates) => {
-    setFormData(prevData => ({
-      ...prevData,
-      ...updates
-    }));
+  // Validate the form before moving to next step
+  const validateForm = () => {
+    // Basic validation could be added here
+    return true;
   };
   
   // Handle next step
   const handleNext = () => {
-    if (activeStep === steps.length - 1) {
-      handleCreateNetwork();
-    } else {
-      setActiveStep(prevStep => prevStep + 1);
+    if (validateForm()) {
+      if (activeStep === steps.length - 1) {
+        handleCreateNetwork();
+      } else {
+        setActiveStep(prevStep => prevStep + 1);
+      }
     }
   };
   
@@ -230,7 +217,10 @@ const NetworkCreation = () => {
         ) : (
           <CurrentStepComponent
             formData={formData}
-            updateFormData={updateFormData}
+            setFormData={setFormData}
+            errors={formErrors}
+            setErrors={setFormErrors}
+            validateForm={validateForm}
             onNext={handleNext}
             onBack={activeStep > 0 ? handleBack : null}
           />

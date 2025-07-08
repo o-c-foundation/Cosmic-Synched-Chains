@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${CHAIN_ID}
+  labels:
+    app: ${CHAIN_ID}
+    chain-id: ${CHAIN_ID}
+    managed-by: cosmos-deploy-platform
+    environment: ${ENVIRONMENT}

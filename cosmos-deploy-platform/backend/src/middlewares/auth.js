@@ -1,101 +1,72 @@
-/**
- * Authentication Middleware
- * 
- * Verifies JWT tokens from request headers and attaches the user to the request object.
- */
-
 const jwt = require('jsonwebtoken');
-const { AuthenticationError } = require('./errorHandler');
 const User = require('../models/User');
 const config = require('../config');
 
 /**
- * Middleware to authenticate requests using JWT
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
+ * Middleware to protect routes
+ * Verifies the JWT token and adds the user to the request object
  */
-const auth = async (req, res, next) => {
+exports.protect = async (req, res, next) => {
+  let token;
+
+  // Get token from Authorization header
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    // Set token from Bearer token in header
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  // Check if token exists
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized to access this route'
+    });
+  }
+
   try {
-    // Get token from header
-    const token = req.header('x-auth-token') || 
-                  req.header('authorization')?.replace('Bearer ', '') || 
-                  req.cookies?.token;
-    
-    // Check if token exists
-    if (!token) {
-      throw new AuthenticationError('No authentication token provided');
+    // Verify token
+    const decoded = jwt.verify(token, config.jwtSecret);
+
+    // Add user to request
+    req.user = await User.findById(decoded.id);
+
+    // If user not found
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found'
+      });
     }
-    
-    try {
-      // Verify token
-      const decoded = jwt.verify(token, config.jwtSecret);
-      
-      // Find user by id
-      const user = await User.findById(decoded.id).select('-password');
-      
-      // Check if user exists
-      if (!user) {
-        throw new AuthenticationError('User not found');
-      }
-      
-      // Attach user to request
-      req.user = user;
-      
-      next();
-    } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-        throw new AuthenticationError('Invalid token');
-      } else if (error.name === 'TokenExpiredError') {
-        throw new AuthenticationError('Token expired');
-      } else {
-        throw error;
-      }
-    }
-  } catch (error) {
-    next(error);
+
+    next();
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    return res.status(401).json({
+      success: false,
+      message: 'Not authorized to access this route'
+    });
   }
 };
 
 /**
- * Middleware to check if user has admin role
- * 
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next function
+ * Middleware to restrict access to specific roles
+ * @param {...String} roles - Roles allowed to access the route
  */
-const requireAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authenticated'
+      });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: `User role ${req.user.role} is not authorized to access this route`
+      });
+    }
     next();
-  } else {
-    next(new AuthenticationError('Admin access required'));
-  }
+  };
 };
-
-// For development/testing only - bypass authentication
-const devBypass = (req, res, next) => {
-  // Only use in development environment
-  if (process.env.NODE_ENV !== 'production' && process.env.BYPASS_AUTH === 'true') {
-    console.warn('⚠️ WARNING: Authentication bypassed in development mode');
-    
-    // Create a mock user
-    req.user = {
-      _id: 'dev-user-id',
-      name: 'Development User',
-      email: 'dev@example.com',
-      role: 'admin'
-    };
-    
-    next();
-  } else {
-    // Fall back to regular auth in production
-    auth(req, res, next);
-  }
-};
-
-module.exports = process.env.NODE_ENV === 'development' && process.env.BYPASS_AUTH === 'true' 
-  ? devBypass 
-  : auth;
-
-module.exports.requireAdmin = requireAdmin;

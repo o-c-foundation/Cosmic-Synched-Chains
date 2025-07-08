@@ -545,3 +545,434 @@ exports.validateGenesis = async (genesisPath) => {
     };
   }
 };
+
+/**
+ * Update app.toml configuration
+ * @param {object} network - Network model instance
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateAppConfig = async (network, projectPath) => {
+  try {
+    console.log(`Updating app.toml for ${network.chainId}`);
+    
+    const appConfigPath = path.join(projectPath, 'config', 'app.toml');
+    
+    // Read existing app.toml
+    let appConfig = '';
+    if (fs.existsSync(appConfigPath)) {
+      appConfig = await fs.readFile(appConfigPath, 'utf8');
+    } else {
+      console.warn(`app.toml not found at ${appConfigPath}, creating new one`);
+    }
+    
+    // Generate updated configuration
+    const apiSection = `
+[api]
+enable = true
+swagger = ${network.features?.apiSwagger ? 'true' : 'false'}
+address = "tcp://0.0.0.0:1317"
+max-open-connections = 1000
+rpc-read-timeout = 10
+rpc-write-timeout = 10
+`;
+
+    const grpcSection = `
+[grpc]
+enable = true
+address = "0.0.0.0:9090"
+`;
+
+    const telemetrySection = `
+[telemetry]
+enable = ${network.features?.telemetry ? 'true' : 'false'}
+prometheus-retention-time = 60
+`;
+
+    const stateSync = `
+[state-sync]
+snapshot-interval = ${network.stateSync?.snapshotInterval || 1000}
+snapshot-keep-recent = ${network.stateSync?.snapshotKeepRecent || 10}
+`;
+
+    // Merge configurations, replacing existing sections
+    const sections = [apiSection, grpcSection, telemetrySection, stateSync];
+    
+    // For a new file, create a full config
+    if (!appConfig) {
+      appConfig = sections.join('\n');
+    } else {
+      // For existing file, update each section
+      const sectionRegexes = [
+        /\[api\][\s\S]*?(?=\n\[|$)/,
+        /\[grpc\][\s\S]*?(?=\n\[|$)/,
+        /\[telemetry\][\s\S]*?(?=\n\[|$)/,
+        /\[state-sync\][\s\S]*?(?=\n\[|$)/
+      ];
+      
+      for (let i = 0; i < sections.length; i++) {
+        if (appConfig.match(sectionRegexes[i])) {
+          appConfig = appConfig.replace(sectionRegexes[i], sections[i].trim());
+        } else {
+          appConfig += '\n' + sections[i];
+        }
+      }
+    }
+    
+    // Write updated config
+    await fs.writeFile(appConfigPath, appConfig);
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating app.toml:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update config.toml configuration
+ * @param {object} network - Network model instance
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateNodeConfig = async (network, projectPath) => {
+  try {
+    console.log(`Updating config.toml for ${network.chainId}`);
+    
+    const configPath = path.join(projectPath, 'config', 'config.toml');
+    
+    // Read existing config.toml
+    let nodeConfig = '';
+    if (fs.existsSync(configPath)) {
+      nodeConfig = await fs.readFile(configPath, 'utf8');
+    } else {
+      console.warn(`config.toml not found at ${configPath}, creating new one`);
+    }
+    
+    // Generate updated configuration
+    const rpcSection = `
+[rpc]
+laddr = "tcp://0.0.0.0:26657"
+cors_allowed_origins = ["*"]
+`;
+
+    const p2pSection = `
+[p2p]
+laddr = "tcp://0.0.0.0:26656"
+seeds = "${network.p2p?.seeds || ''}"
+persistent_peers = "${network.p2p?.persistentPeers || ''}"
+addr_book_strict = ${network.p2p?.addrBookStrict ? 'true' : 'false'}
+max_num_inbound_peers = ${network.p2p?.maxInboundPeers || 40}
+max_num_outbound_peers = ${network.p2p?.maxOutboundPeers || 10}
+`;
+
+    const mempoolSection = `
+[mempool]
+size = ${network.mempool?.size || 5000}
+max_tx_bytes = ${network.mempool?.maxTxBytes || 1048576}
+`;
+
+    const consensusSection = `
+[consensus]
+timeout_propose = "${network.consensus?.timeoutPropose || '3s'}"
+timeout_prevote = "${network.consensus?.timeoutPrevote || '1s'}"
+timeout_precommit = "${network.consensus?.timeoutPrecommit || '1s'}"
+timeout_commit = "${network.consensus?.timeoutCommit || '5s'}"
+`;
+
+    const txIndexSection = `
+[tx_index]
+indexer = "kv"
+`;
+
+    const instrumentationSection = `
+[instrumentation]
+prometheus = ${network.features?.prometheus ? 'true' : 'false'}
+prometheus_listen_addr = ":26660"
+`;
+
+    // Merge configurations, replacing existing sections
+    const sections = [rpcSection, p2pSection, mempoolSection, consensusSection, txIndexSection, instrumentationSection];
+    
+    // For a new file, create a full config
+    if (!nodeConfig) {
+      nodeConfig = sections.join('\n');
+    } else {
+      // For existing file, update each section
+      const sectionRegexes = [
+        /\[rpc\][\s\S]*?(?=\n\[|$)/,
+        /\[p2p\][\s\S]*?(?=\n\[|$)/,
+        /\[mempool\][\s\S]*?(?=\n\[|$)/,
+        /\[consensus\][\s\S]*?(?=\n\[|$)/,
+        /\[tx_index\][\s\S]*?(?=\n\[|$)/,
+        /\[instrumentation\][\s\S]*?(?=\n\[|$)/
+      ];
+      
+      for (let i = 0; i < sections.length; i++) {
+        if (nodeConfig.match(sectionRegexes[i])) {
+          nodeConfig = nodeConfig.replace(sectionRegexes[i], sections[i].trim());
+        } else {
+          nodeConfig += '\n' + sections[i];
+        }
+      }
+    }
+    
+    // Write updated config
+    await fs.writeFile(configPath, nodeConfig);
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating config.toml:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update client.toml configuration
+ * @param {object} network - Network model instance
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateClientConfig = async (network, projectPath) => {
+  try {
+    console.log(`Updating client.toml for ${network.chainId}`);
+    
+    const clientConfigPath = path.join(projectPath, 'config', 'client.toml');
+    
+    // Generate client configuration
+    const clientConfig = `
+# Client Configuration
+chain-id = "${network.chainId}"
+keyring-backend = "test"
+output = "json"
+node = "tcp://localhost:26657"
+broadcast-mode = "sync"
+`;
+    
+    // Write client config
+    await fs.writeFile(clientConfigPath, clientConfig);
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating client.toml:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update module parameters in genesis
+ * @param {object} moduleParams - Module parameters
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateModuleParams = async (moduleParams, projectPath) => {
+  try {
+    console.log(`Updating module parameters at ${projectPath}`);
+    
+    const genesisPath = path.join(projectPath, 'config', 'genesis.json');
+    
+    // Read existing genesis file
+    let genesis = JSON.parse(await fs.readFile(genesisPath, 'utf8'));
+    
+    // Update each module's parameters
+    for (const [module, params] of Object.entries(moduleParams)) {
+      if (genesis.app_state[module]) {
+        // Handle special cases for some modules
+        if (module === 'staking') {
+          if (params.unbonding_time) {
+            // Convert days to nanoseconds string format
+            const unbondingNanos = `${params.unbonding_time * 24 * 60 * 60}s`;
+            genesis.app_state.staking.params.unbonding_time = unbondingNanos;
+          }
+          
+          // Update other staking params
+          for (const [key, value] of Object.entries(params)) {
+            if (key !== 'unbonding_time') {
+              genesis.app_state.staking.params[key] = value;
+            }
+          }
+        } else if (module === 'gov') {
+          // Handle voting period conversion for governance
+          if (params.voting_period) {
+            // Convert days to seconds string format
+            const votingPeriod = `${params.voting_period * 24 * 60 * 60}s`;
+            genesis.app_state.gov.voting_params.voting_period = votingPeriod;
+          }
+          
+          // Update deposit and tally params
+          if (params.min_deposit) {
+            genesis.app_state.gov.deposit_params.min_deposit = params.min_deposit;
+          }
+          if (params.max_deposit_period) {
+            genesis.app_state.gov.deposit_params.max_deposit_period = params.max_deposit_period;
+          }
+          if (params.quorum) {
+            genesis.app_state.gov.tally_params.quorum = params.quorum;
+          }
+          if (params.threshold) {
+            genesis.app_state.gov.tally_params.threshold = params.threshold;
+          }
+          if (params.veto_threshold) {
+            genesis.app_state.gov.tally_params.veto_threshold = params.veto_threshold;
+          }
+        } else {
+          // For other modules, directly update their params
+          genesis.app_state[module].params = {
+            ...genesis.app_state[module].params,
+            ...params
+          };
+        }
+      } else {
+        console.warn(`Module ${module} not found in genesis state`);
+      }
+    }
+    
+    // Write updated genesis
+    await fs.writeFile(genesisPath, JSON.stringify(genesis, null, 2));
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating module parameters:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update genesis file with token economics
+ * @param {object} network - Network model instance
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateGenesisTokenEconomics = async (network, projectPath) => {
+  try {
+    console.log(`Updating genesis token economics for ${network.chainId}`);
+    
+    const genesisPath = path.join(projectPath, 'config', 'genesis.json');
+    
+    // Read existing genesis file
+    let genesis = JSON.parse(await fs.readFile(genesisPath, 'utf8'));
+    
+    const tokenEconomics = network.tokenEconomics;
+    
+    // Calculate token allocations
+    const initialSupply = tokenEconomics.initialSupply;
+    const bondDenom = tokenEconomics.symbol.toLowerCase();
+    
+    // Update chain parameters related to token economics
+    
+    // Update staking parameters
+    if (genesis.app_state.staking) {
+      genesis.app_state.staking.params.bond_denom = bondDenom;
+    }
+    
+    // Update crisis parameters
+    if (genesis.app_state.crisis) {
+      genesis.app_state.crisis.constant_fee = {
+        denom: bondDenom,
+        amount: "1000"
+      };
+    }
+    
+    // Update mint parameters
+    if (genesis.app_state.mint) {
+      genesis.app_state.mint.params.mint_denom = bondDenom;
+      genesis.app_state.mint.params.inflation_rate_change = (tokenEconomics.inflationRateChange || 0.13).toString();
+      genesis.app_state.mint.params.inflation_max = (tokenEconomics.inflationMax || 0.20).toString();
+      genesis.app_state.mint.params.inflation_min = (tokenEconomics.inflationMin || 0.07).toString();
+      genesis.app_state.mint.params.goal_bonded = (tokenEconomics.goalBonded || 0.67).toString();
+    }
+    
+    // Update gov parameters
+    if (genesis.app_state.gov && genesis.app_state.gov.deposit_params) {
+      genesis.app_state.gov.deposit_params.min_deposit = [
+        {
+          denom: bondDenom,
+          amount: (tokenEconomics.govMinDeposit || 10000000).toString()
+        }
+      ];
+    }
+    
+    // Set up token metadata
+    if (genesis.app_state.bank && genesis.app_state.bank.denom_metadata) {
+      genesis.app_state.bank.denom_metadata = [
+        {
+          description: tokenEconomics.description || `Token for ${network.name}`,
+          denom_units: [
+            {
+              denom: bondDenom,
+              exponent: 0,
+              aliases: []
+            },
+            {
+              denom: tokenEconomics.symbol,
+              exponent: tokenEconomics.decimals || 6,
+              aliases: []
+            }
+          ],
+          base: bondDenom,
+          display: tokenEconomics.symbol,
+          name: tokenEconomics.name || tokenEconomics.symbol,
+          symbol: tokenEconomics.symbol
+        }
+      ];
+    }
+    
+    // Write updated genesis
+    await fs.writeFile(genesisPath, JSON.stringify(genesis, null, 2));
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating genesis token economics:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update genesis file with governance parameters
+ * @param {object} network - Network model instance
+ * @param {string} projectPath - Path to project directory
+ * @returns {Promise<boolean>} - Success status
+ */
+exports.updateGenesisGovernance = async (network, projectPath) => {
+  try {
+    console.log(`Updating genesis governance for ${network.chainId}`);
+    
+    const genesisPath = path.join(projectPath, 'config', 'genesis.json');
+    
+    // Read existing genesis file
+    let genesis = JSON.parse(await fs.readFile(genesisPath, 'utf8'));
+    
+    const governance = network.governanceSettings;
+    
+    if (genesis.app_state.gov) {
+      // Update voting parameters
+      if (genesis.app_state.gov.voting_params) {
+        // Convert days to seconds
+        const votingPeriodSeconds = governance.votingPeriod * 24 * 60 * 60;
+        genesis.app_state.gov.voting_params.voting_period = `${votingPeriodSeconds}s`;
+      }
+      
+      // Update tally parameters
+      if (genesis.app_state.gov.tally_params) {
+        genesis.app_state.gov.tally_params.quorum = governance.quorum.toString();
+        genesis.app_state.gov.tally_params.threshold = governance.threshold.toString();
+        genesis.app_state.gov.tally_params.veto_threshold = governance.vetoThreshold.toString();
+      }
+      
+      // Update deposit parameters
+      if (genesis.app_state.gov.deposit_params) {
+        // Convert days to seconds
+        const depositPeriodSeconds = governance.maxDepositPeriod * 24 * 60 * 60;
+        genesis.app_state.gov.deposit_params.max_deposit_period = `${depositPeriodSeconds}s`;
+      }
+    }
+    
+    // Write updated genesis
+    await fs.writeFile(genesisPath, JSON.stringify(genesis, null, 2));
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating genesis governance:', error);
+    throw error;
+  }
+};

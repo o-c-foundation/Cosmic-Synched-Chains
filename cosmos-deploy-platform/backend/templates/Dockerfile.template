@@ -1,0 +1,39 @@
+# Cosmos SDK Blockchain Node Dockerfile
+FROM golang:1.19-alpine as builder
+
+# Set up dependencies
+RUN apk add --no-cache git make gcc libc-dev
+
+# Set working directory
+WORKDIR /app
+
+# Clone and build the chain binary
+RUN git clone https://github.com/cosmos/gaia.git . && \
+    git checkout v7.0.2 && \
+    make install
+
+# Final image
+FROM alpine:3.15
+
+# Set up runtime dependencies
+RUN apk add --no-cache ca-certificates curl jq bash
+
+# Copy over binaries from the builder
+COPY --from=builder /go/bin/${CHAIN_ID}d /usr/local/bin/
+
+# Create app directory
+RUN mkdir -p /root/.${CHAIN_ID}
+
+# Copy configuration
+COPY ./config /root/.${CHAIN_ID}/config
+
+# Expose ports
+# - 26656: P2P
+# - 26657: RPC
+# - 1317: REST API
+# - 9090: gRPC
+EXPOSE 26656 26657 1317 9090
+
+# Define command
+ENTRYPOINT ["${CHAIN_ID}d"]
+CMD ["start", "--home", "/root/.${CHAIN_ID}"]

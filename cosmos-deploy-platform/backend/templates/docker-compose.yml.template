@@ -1,0 +1,135 @@
+version: '3.8'
+
+networks:
+  ${CHAIN_ID}_net:
+    driver: bridge
+
+services:
+  # Validator nodes
+  ${CHAIN_ID}-validator-1:
+    container_name: ${CHAIN_ID}-validator-1
+    image: ${CHAIN_ID}:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - CHAIN_ID=${CHAIN_ID}
+      - MONIKER=validator-1
+      - VALIDATOR_STAKE=10000${TOKEN_SYMBOL}
+    volumes:
+      - ./validators/validator-1/config:/root/.${CHAIN_ID}/config
+      - ./validators/validator-1/data:/root/.${CHAIN_ID}/data
+    ports:
+      - "26656:26656"
+      - "26657:26657"
+      - "1317:1317"
+      - "9090:9090"
+    networks:
+      - ${CHAIN_ID}_net
+    command: start --home /root/.${CHAIN_ID}
+    restart: unless-stopped
+
+  # Additional validators (added based on VALIDATOR_COUNT)
+  ${CHAIN_ID}-validator-2:
+    container_name: ${CHAIN_ID}-validator-2
+    image: ${CHAIN_ID}:latest
+    depends_on:
+      - ${CHAIN_ID}-validator-1
+    environment:
+      - CHAIN_ID=${CHAIN_ID}
+      - MONIKER=validator-2
+      - VALIDATOR_STAKE=10000${TOKEN_SYMBOL}
+      - PERSISTENT_PEERS=tcp://${CHAIN_ID}-validator-1:26656
+    volumes:
+      - ./validators/validator-2/config:/root/.${CHAIN_ID}/config
+      - ./validators/validator-2/data:/root/.${CHAIN_ID}/data
+    ports:
+      - "26659:26656"
+      - "26660:26657"
+      - "1318:1317"
+      - "9091:9090"
+    networks:
+      - ${CHAIN_ID}_net
+    command: start --home /root/.${CHAIN_ID}
+    restart: unless-stopped
+
+  ${CHAIN_ID}-validator-3:
+    container_name: ${CHAIN_ID}-validator-3
+    image: ${CHAIN_ID}:latest
+    depends_on:
+      - ${CHAIN_ID}-validator-1
+    environment:
+      - CHAIN_ID=${CHAIN_ID}
+      - MONIKER=validator-3
+      - VALIDATOR_STAKE=10000${TOKEN_SYMBOL}
+      - PERSISTENT_PEERS=tcp://${CHAIN_ID}-validator-1:26656
+    volumes:
+      - ./validators/validator-3/config:/root/.${CHAIN_ID}/config
+      - ./validators/validator-3/data:/root/.${CHAIN_ID}/data
+    ports:
+      - "26661:26656"
+      - "26662:26657"
+      - "1319:1317"
+      - "9092:9090"
+    networks:
+      - ${CHAIN_ID}_net
+    command: start --home /root/.${CHAIN_ID}
+    restart: unless-stopped
+
+  ${CHAIN_ID}-validator-4:
+    container_name: ${CHAIN_ID}-validator-4
+    image: ${CHAIN_ID}:latest
+    depends_on:
+      - ${CHAIN_ID}-validator-1
+    environment:
+      - CHAIN_ID=${CHAIN_ID}
+      - MONIKER=validator-4
+      - VALIDATOR_STAKE=10000${TOKEN_SYMBOL}
+      - PERSISTENT_PEERS=tcp://${CHAIN_ID}-validator-1:26656
+    volumes:
+      - ./validators/validator-4/config:/root/.${CHAIN_ID}/config
+      - ./validators/validator-4/data:/root/.${CHAIN_ID}/data
+    ports:
+      - "26663:26656"
+      - "26664:26657"
+      - "1320:1317"
+      - "9093:9090"
+    networks:
+      - ${CHAIN_ID}_net
+    command: start --home /root/.${CHAIN_ID}
+    restart: unless-stopped
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ${CHAIN_ID}-prometheus
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    ports:
+      - "9095:9090"
+    networks:
+      - ${CHAIN_ID}_net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ${CHAIN_ID}-grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - ${CHAIN_ID}_net
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=cosmos
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:

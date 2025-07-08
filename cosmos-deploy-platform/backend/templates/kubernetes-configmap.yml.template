@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${CHAIN_ID}-config
+  namespace: ${CHAIN_ID}
+  labels:
+    app: ${CHAIN_ID}
+    component: validator
+    chain-id: ${CHAIN_ID}
+data:
+  config.toml: |
+    # This is a TOML config file for Cosmos nodes
+
+    [rpc]
+    laddr = "tcp://0.0.0.0:26657"
+
+    [p2p]
+    laddr = "tcp://0.0.0.0:26656"
+    seeds = "${SEEDS}"
+    persistent_peers = "${PERSISTENT_PEERS}"
+
+    [mempool]
+    size = 5000
+    max_tx_bytes = 1048576
+
+    [consensus]
+    timeout_propose = "3s"
+    timeout_prevote = "1s"
+    timeout_precommit = "1s"
+    timeout_commit = "5s"
+
+    [tx_index]
+    indexer = "kv"
+
+    [instrumentation]
+    prometheus = true
+    prometheus_listen_addr = ":26660"
+
+  app.toml: |
+    # This is a TOML config file for Cosmos applications
+
+    [api]
+    enable = true
+    address = "tcp://0.0.0.0:1317"
+
+    [grpc]
+    enable = true
+    address = "0.0.0.0:9090"
+
+    [telemetry]
+    enable = true
+    prometheus-retention-time = 60
+
+    [state-sync]
+    snapshot-interval = 1000
+    snapshot-keep-recent = 10
+
+  node-key.json: ${NODE_KEY}
+  priv_validator_key.json: ${VALIDATOR_KEY}

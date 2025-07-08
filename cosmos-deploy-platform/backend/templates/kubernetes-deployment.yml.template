@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${CHAIN_ID}-validator
+  namespace: ${CHAIN_ID}
+  labels:
+    app: ${CHAIN_ID}
+    component: validator
+    chain-id: ${CHAIN_ID}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${CHAIN_ID}
+      component: validator
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: ${CHAIN_ID}
+        component: validator
+        chain-id: ${CHAIN_ID}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "26660"
+    spec:
+      containers:
+      - name: ${CHAIN_ID}-node
+        image: ${REGISTRY_URL}/${CHAIN_ID}:${IMAGE_TAG}
+        imagePullPolicy: Always
+        command:
+        - /bin/sh
+        - -c
+        - |
+          ${CHAIN_ID}d start --home /root/.${CHAIN_ID}
+        ports:
+        - name: p2p
+          containerPort: 26656
+        - name: rpc
+          containerPort: 26657
+        - name: api
+          containerPort: 1317
+        - name: grpc
+          containerPort: 9090
+        - name: metrics
+          containerPort: 26660
+        volumeMounts:
+        - name: config-volume
+          mountPath: /root/.${CHAIN_ID}/config
+        - name: data
+          mountPath: /root/.${CHAIN_ID}/data
+        resources:
+          requests:
+            cpu: ${CPU_REQUEST}
+            memory: ${MEMORY_REQUEST}
+          limits:
+            cpu: ${CPU_LIMIT}
+            memory: ${MEMORY_LIMIT}
+        livenessProbe:
+          httpGet:
+            path: /status
+            port: 26657
+          initialDelaySeconds: 300
+          timeoutSeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: 26657
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: config-volume
+        configMap:
+          name: ${CHAIN_ID}-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: ${CHAIN_ID}-validator-data

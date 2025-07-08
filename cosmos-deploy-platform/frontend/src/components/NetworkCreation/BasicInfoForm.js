@@ -14,7 +14,8 @@ import {
   Switch,
   FormControlLabel,
   Tooltip,
-  IconButton
+  IconButton,
+  Button
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -122,7 +123,7 @@ const diskSizes = [
   { value: 2000, label: '2 TB' }
 ];
 
-const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm }) => {
+const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm, onNext, onBack }) => {
   const [availableRegions, setAvailableRegions] = useState([]);
   const [availableNodeTypes, setAvailableNodeTypes] = useState([]);
   
@@ -148,7 +149,7 @@ const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm 
         });
       }
     }
-  }, [formData.provider]);
+  }, [formData.provider, setFormData]);
   
   // Validate individual field
   const validateField = (name, value) => {
@@ -210,6 +211,17 @@ const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm 
     setErrors(fieldErrors);
   };
   
+  // Check if form is valid before proceeding
+  const isFormValid = () => {
+    const requiredFields = ['name', 'provider', 'region', 'nodeType', 'diskSize'];
+    const hasRequiredFields = requiredFields.every(field => formData[field]);
+    
+    // Check for errors
+    const hasErrors = Object.keys(errors).length > 0;
+    
+    return hasRequiredFields && !hasErrors;
+  };
+  
   // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -227,6 +239,25 @@ const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm 
       ...formData,
       advancedMode: e.target.checked
     });
+  };
+  
+  // Handle continuing to next step
+  const handleNext = () => {
+    // Validate all required fields
+    const requiredFields = ['name', 'provider', 'region', 'nodeType', 'diskSize'];
+    let newErrors = { ...errors };
+    
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')} is required`;
+      }
+    });
+    
+    setErrors(newErrors);
+    
+    if (isFormValid()) {
+      onNext();
+    }
   };
   
   return (
@@ -426,6 +457,18 @@ const BasicInfoForm = ({ formData, setFormData, errors, setErrors, validateForm 
             </Grid>
           </>
         )}
+        
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handleNext}
+            >
+              Continue
+            </Button>
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   );
