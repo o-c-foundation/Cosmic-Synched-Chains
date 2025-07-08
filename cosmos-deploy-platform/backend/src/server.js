@@ -2,22 +2,30 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const config = require('./config');
-const { errorHandler } = require('./middlewares/errorHandler');
+const errorHandler = require('./middlewares/errorHandler');
 const database = require('./utils/database');
 
 // Import routes
 const indexRoutes = require('./routes/index');
 const networkRoutes = require('./routes/networkRoutes');
 const authRoutes = require('./routes/authRoutes');
+const healthRoutes = require('./routes/healthRoutes');
 
 // Create Express app
 const app = express();
 
 // Connect to MongoDB
-database.connect();
+database.connectToDatabase(config.mongoUri)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: config.corsOrigins || ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Logging middleware
@@ -26,9 +34,19 @@ app.use((req, res, next) => {
   next();
 });
 
+// Direct health endpoint (accessible at /health)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Service is up and running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Routes
-app.use('/', indexRoutes);
+app.use('/api', indexRoutes);  // All API routes including /api/health
 app.use('/api/networks', networkRoutes);
+app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 
 // Error handling middleware

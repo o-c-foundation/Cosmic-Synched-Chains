@@ -5,7 +5,7 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 // API base URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://beta.syncron.network/api';
 
 // Auth provider component
 export const AuthProvider = ({ children }) => {

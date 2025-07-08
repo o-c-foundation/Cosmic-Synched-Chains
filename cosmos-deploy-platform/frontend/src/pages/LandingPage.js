@@ -34,12 +34,33 @@ const LandingPage = () => {
   const HeroSection = () => (
     <Box
       sx={{
-        backgroundImage: 'linear-gradient(135deg, #2E3192 0%, #1A1C63 100%)',
+        backgroundColor: '#000000',
+        backgroundImage: 'radial-gradient(circle at 50% 120%, #121212 0%, #000000 100%)',
         color: 'white',
         pt: { xs: 8, md: 12 },
-        pb: { xs: 10, md: 16 }
+        pb: { xs: 10, md: 16 },
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
+      {/* Animated glow effect */}
+      <Box
+        sx={{
+          position: 'absolute',
+          width: '60%',
+          height: '60%',
+          background: 'radial-gradient(circle, rgba(204,255,0,0.15) 0%, rgba(0,0,0,0) 70%)',
+          top: '-20%',
+          right: '-20%',
+          borderRadius: '50%',
+          animation: 'pulse 8s infinite ease-in-out',
+          '@keyframes pulse': {
+            '0%': { opacity: 0.4, transform: 'scale(1)' },
+            '50%': { opacity: 0.8, transform: 'scale(1.2)' },
+            '100%': { opacity: 0.4, transform: 'scale(1)' }
+          }
+        }}
+      />
       <Container maxWidth="lg">
         <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={6}>
@@ -48,11 +69,35 @@ const LandingPage = () => {
               component="h1"
               fontWeight="bold"
               gutterBottom
-              sx={{ fontSize: { xs: '2.5rem', md: '3.5rem' } }}
+              sx={{
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                position: 'relative',
+                zIndex: 2,
+                '& .highlight': {
+                  color: '#CCFF00', // Correct green color
+                  textShadow: '0 0 10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.5)',
+                  animation: 'flicker 3s infinite alternate',
+                  '@keyframes flicker': {
+                    '0%, 100%': { textShadow: '0 0 10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.5)' },
+                    '50%': { textShadow: '0 0 15px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 0, 0, 0.7)' }
+                  }
+                }
+              }}
             >
+              <span className="highlight">Cosmic Synched Chains</span><br />
               Deploy Cosmos Blockchains With Ease
             </Typography>
-            <Typography variant="h5" paragraph sx={{ mb: 4, opacity: 0.9 }}>
+            <Typography variant="h5" paragraph sx={{
+              mb: 4,
+              opacity: 0.9,
+              position: 'relative',
+              zIndex: 2,
+              animation: 'fadeIn 1s ease-in',
+              '@keyframes fadeIn': {
+                from: { opacity: 0, transform: 'translateY(20px)' },
+                to: { opacity: 0.9, transform: 'translateY(0)' }
+              }
+            }}>
               The all-in-one platform for creating, deploying, and managing Cosmos-based blockchain networks in minutes, not months.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -66,9 +111,31 @@ const LandingPage = () => {
                   py: 1.5, 
                   px: 4, 
                   fontSize: '1.1rem',
-                  backgroundColor: '#E50278',
+                  backgroundColor: '#CCFF00',
+                  color: '#000000',
+                  fontWeight: 'bold',
+                  letterSpacing: '0.5px',
+                  fontWeight: 'bold',
+                  textShadow: 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '-50%',
+                    left: '-50%',
+                    width: '200%',
+                    height: '200%',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    transform: 'rotate(45deg)',
+                    animation: 'shine 3s infinite',
+                    '@keyframes shine': {
+                      from: { transform: 'translateX(-100%) rotate(45deg)' },
+                      to: { transform: 'translateX(100%) rotate(45deg)' }
+                    }
+                  },
                   '&:hover': {
-                    backgroundColor: '#AD004F'
+                    backgroundColor: '#B8E600'
                   }
                 }}
               >
@@ -132,13 +199,13 @@ const LandingPage = () => {
             icon={<SpeedIcon sx={{ fontSize: 50 }} />}
             title="Quick Deployment"
             description="Launch a fully functional blockchain network in minutes with just a few clicks."
-            color="#2E3192"
+            color="#CCFF00"
           />
           <FeatureCard
             icon={<SecurityIcon sx={{ fontSize: 50 }} />}
             title="Enterprise Security"
             description="Bank-grade security with automated backups and disaster recovery."
-            color="#E50278"
+            color="#CCFF00"
           />
           <FeatureCard
             icon={<SettingsIcon sx={{ fontSize: 50 }} />}
@@ -172,12 +239,35 @@ const LandingPage = () => {
   // Feature Card Component
   const FeatureCard = ({ icon, title, description, color }) => (
     <Grid item xs={12} sm={6} md={4}>
-      <Card sx={{ height: '100%', borderRadius: 3, transition: 'transform 0.3s', '&:hover': { transform: 'translateY(-8px)' } }}>
+      <Card sx={{
+        height: '100%',
+        borderRadius: 3,
+        transition: 'all 0.4s ease',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 100%)',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: `0 10px 30px rgba(204, 255, 0, 0.15)`
+        }
+      }}>
         <CardContent sx={{ p: 4 }}>
-          <Box sx={{ color: color, mb: 2 }}>
+          <Box sx={{
+            color: color === '#CCFF00' ? color : color,
+            textShadow: color === '#CCFF00' ? '0 0 8px rgba(0, 0, 0, 0.5)' : 'none',
+            mb: 2,
+            animation: 'iconPulse 3s infinite alternate ease-in-out',
+            '@keyframes iconPulse': {
+              '0%': { transform: 'scale(1)' },
+              '100%': { transform: 'scale(1.1)' }
+            }
+          }}>
             {icon}
           </Box>
-          <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom>
+          <Typography variant="h5" component="h3" fontWeight="bold" gutterBottom sx={{
+             color: color === '#CCFF00' ? color : 'inherit',
+             textShadow: color === '#CCFF00' ? '0 0 8px rgba(0, 0, 0, 0.5)' : 'none'
+          }}>
             {title}
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -302,14 +392,15 @@ const LandingPage = () => {
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} sm={6} md={4}>
             <PricingCard
-              title="Developer"
-              price="Free"
-              description="Perfect for testing and development"
+              title="Free Tier"
+              price="$0"
+              description="Perfect for exploration and testing"
               features={[
-                "1 testnet deployment",
-                "Basic monitoring",
-                "Community support",
-                "Standard infrastructure"
+                "Single network deployment",
+                "Up to 3 validators",
+                "Basic monitoring tools",
+                "Local and testnet deployment",
+                "Community support"
               ]}
               buttonText="Start Free"
               buttonLink="/signup"
@@ -319,18 +410,19 @@ const LandingPage = () => {
           <Grid item xs={12} sm={6} md={4}>
             <PricingCard
               title="Professional"
-              price="$299"
+              price="$199"
               period="per month"
               description="For production networks and teams"
               features={[
-                "Up to 3 networks",
-                "Advanced monitoring",
-                "Priority support",
-                "High-performance infrastructure",
-                "Automatic backups",
-                "Custom domain"
+                "Unlimited networks",
+                "Up to 30 validators per network",
+                "Advanced monitoring & alerts",
+                "Multi-cloud deployment",
+                "Advanced security features",
+                "Full governance toolset",
+                "Priority support"
               ]}
-              buttonText="Get Started"
+              buttonText="Choose Professional"
               buttonLink="/signup"
               highlighted={true}
             />
@@ -339,17 +431,17 @@ const LandingPage = () => {
             <PricingCard
               title="Enterprise"
               price="Custom"
-              description="For organizations with complex needs"
+              description="For large-scale deployments"
               features={[
                 "Unlimited networks",
-                "Enterprise SLA",
-                "Dedicated support",
-                "Custom infrastructure",
-                "Compliance features",
-                "White-label options",
-                "On-premises deployment"
+                "Unlimited validators",
+                "Custom monitoring solutions",
+                "Multi-cloud & on-premises",
+                "Enterprise security features",
+                "24/7 dedicated support",
+                "Compliance & regulatory tools"
               ]}
-              buttonText="Contact Us"
+              buttonText="Contact Sales"
               buttonLink="/contact"
               highlighted={false}
             />
@@ -369,8 +461,11 @@ const LandingPage = () => {
         p: 4,
         position: 'relative',
         overflow: 'hidden',
-        transition: 'transform 0.3s',
-        '&:hover': { transform: 'translateY(-8px)' },
+        transition: 'all 0.4s ease',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: highlighted ? `0 10px 30px rgba(204, 255, 0, 0.3)` : '0 10px 30px rgba(0, 0, 0, 0.1)'
+        },
         ...(highlighted && {
           border: `2px solid ${theme.palette.primary.main}`,
           boxShadow: `0 10px 40px ${theme.palette.primary.main}30`,
@@ -457,13 +552,13 @@ const LandingPage = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Cosmos Deploy
+              Cosmic Synched Chains
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
               The easiest way to launch and manage your own Cosmos blockchain network.
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              © {new Date().getFullYear()} Cosmos Deploy. All rights reserved.
+              © {new Date().getFullYear()} Cosmic Synched Chains by Syncron Labs. All rights reserved.
             </Typography>
           </Grid>
           <Grid item xs={6} sm={3} md={2}>

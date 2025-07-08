@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSC Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #CCFF00;
+      --secondary-color: #000000;
+      --background-color: #f5f5f5;
+      --card-color: #ffffff;
+      --text-color: #333333;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    header {
+      background-color: var(--primary-color);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+    }
+    
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+    
+    nav ul li {
+      margin-left: 1.5rem;
+    }
+    
+    nav ul li a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    nav ul li a:hover {
+      opacity: 0.8;
+    }
+    
+    main {
+      flex: 1;
+      padding: 2rem;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .card {
+      background-color: var(--card-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      transition: transform 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+    }
+    
+    .card-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    footer {
+      background-color: var(--secondary-color);
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    .status-inactive {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    .status-warning {
+      background-color: #ff9800;
+      color: black;
+    }
+    
+    .content-section {
+      background-color: var(--card-color);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+    }
+    
+    .refresh-button {
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    .refresh-button:hover {
+      opacity: 0.9;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    
+    table th {
+      text-align: left;
+      padding: 0.5rem;
+      background-color: #f1f1f1;
+    }
+    
+    table td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    #api-status-message {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+    }
+    
+    .status-ok {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .status-error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Cosmic Synched Chains Admin</div>
+      <nav>
+        <ul>
+          <li><a href="#" class="active">Dashboard</a></li>
+          <li><a href="#" onclick="showUsersSection()">Users</a></li>
+          <li><a href="#" onclick="showNetworksSection()">Networks</a></li>
+          <li><a href="#" onclick="showSystemSection()">System</a></li>
+        </ul>
+      </nav>
+    </header>
+    
+    <main>
+      <div class="content-section">
+        <div class="section-title">
+          Admin Dashboard
+          <button class="refresh-button" onclick="refreshData()">Refresh Data</button>
+        </div>
+        
+        <div class="dashboard">
+          <div class="card">
+            <div class="card-title">Total Users</div>
+            <div class="card-value" id="total-users">--</div>
+            <div class="card-subtitle">Registered accounts</div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Total Networks</div>
+            <div class="card-value" id="total-networks">--</div>
+            <div class="card-subtitle">Deployed blockchains</div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">Active Networks</div>
+            <div class="card-value" id="active-networks">--</div>
+            <div class="card-subtitle">Currently running</div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">System Status</div>
+            <div class="card-value" id="system-status">--</div>
+            <div class="card-subtitle">Health check</div>
+          </div>
+        </div>
+        
+        <div class="content-section">
+          <div class="section-title">API Connection</div>
+          <p>Testing connection to Admin Backend API (http://localhost:4001)</p>
+          <div id="api-status-message"></div>
+          <button class="refresh-button" onclick="testApiConnection()">Test Connection</button>
+        </div>
+        
+        <div id="users-section" style="display: none;" class="content-section">
+          <div class="section-title">Users Management</div>
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- User data will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="networks-section" style="display: none;" class="content-section">
+          <div class="section-title">Networks Management</div>
+          <table id="networks-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Chain ID</th>
+                <th>Status</th>
+                <th>Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Network data will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="system-section" style="display: none;" class="content-section">
+          <div class="section-title">System Status</div>
+          <table id="system-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frontend</td>
+                <td><span class="status-badge status-active">Active</span></td>
+                <td>Port 3000</td>
+              </tr>
+              <tr>
+                <td>Backend API</td>
+                <td><span id="backend-status" class="status-badge status-warning">Checking...</span></td>
+                <td>Port 4000</td>
+              </tr>
+              <tr>
+                <td>Admin Backend</td>
+                <td><span id="admin-backend-status" class="status-badge status-warning">Checking...</span></td>
+                <td>Port 4001</td>
+              </tr>
+              <tr>
+                <td>Database</td>
+                <td><span id="database-status" class="status-badge status-warning">Checking...</span></td>
+                <td>MongoDB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      Cosmic Synched Chains by Syncron Labs &copy; 2025 - Admin Access Only
+    </footer>
+  </div>
+  
+  <script>
+    // Quick stats variables
+    let quickStats = {
+      totalUsers: 0,
+      totalNetworks: 0,
+      activeNetworks: 0,
+      systemStatus: 'Unknown'
+    };
+    
+    // Function to refresh dashboard data
+    function refreshData() {
+      // Update dashboard cards with loading indicators
+      document.getElementById('total-users').textContent = 'Loading...';
+      document.getElementById('total-networks').textContent = 'Loading...';
+      document.getElementById('active-networks').textContent = 'Loading...';
+      document.getElementById('system-status').textContent = 'Checking...';
+      
+      // Fetch quick stats from admin backend
+      fetch('http://localhost:4001/api/dashboard/quick-stats')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Update quick stats
+          if (data.success) {
+            quickStats = data.data;
+            
+            // Update dashboard cards
+            document.getElementById('total-users').textContent = quickStats.totalUsers;
+            document.getElementById('total-networks').textContent = quickStats.totalNetworks;
+            document.getElementById('active-networks').textContent = quickStats.activeNetworks;
+            document.getElementById('system-status').textContent = quickStats.unresolvedErrors > 0 ? 
+              quickStats.unresolvedErrors + ' Issues' : 'Healthy';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching quick stats:', error);
+          document.getElementById('total-users').textContent = '--';
+          document.getElementById('total-networks').textContent = '--';
+          document.getElementById('active-networks').textContent = '--';
+          document.getElementById('system-status').textContent = 'Error';
+        });
+      
+      // Test connections to backend services
+      testApiConnection();
+    }
+    
+    // Function to test API connection
+    function testApiConnection() {
+      const apiStatusMessage = document.getElementById('api-status-message');
+      apiStatusMessage.textContent = 'Testing connection...';
+      apiStatusMessage.className = '';
+      
+      // Test admin backend connection
+      fetch('http://localhost:4001/health')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Admin backend not responding');
+          }
+          return response.json();
+        })
+        .then(data => {
+          apiStatusMessage.textContent = 'Successfully connected to Admin Backend API!';
+          apiStatusMessage.className = 'status-ok';
+          
+          // Update system status table
+          document.getElementById('admin-backend-status').textContent = 'Active';
+          document.getElementById('admin-backend-status').className = 'status-badge status-active';
+        })
+        .catch(error => {
+          console.error('Error connecting to Admin Backend API:', error);
+          apiStatusMessage.textContent = 'Failed to connect to Admin Backend API. Make sure the server is running on port 4001.';
+          apiStatusMessage.className = 'status-error';
+          
+          // Update system status table
+          document.getElementById('admin-backend-status').textContent = 'Inactive';
+          document.getElementById('admin-backend-status').className = 'status-badge status-inactive';
+        });
+      
+      // Test main backend connection
+      fetch('http://localhost:4000/health')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Main backend not responding');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Update system status table
+          document.getElementById('backend-status').textContent = 'Active';
+          document.getElementById('backend-status').className = 'status-badge status-active';
+        })
+        .catch(error => {
+          console.error('Error connecting to Main Backend API:', error);
+          document.getElementById('backend-status').textContent = 'Inactive';
+          document.getElementById('backend-status').className = 'status-badge status-inactive';
+        });
+    }
+    
+    // Show Users Section
+    function showUsersSection() {
+      document.getElementById('users-section').style.display = 'block';
+      document.getElementById('networks-section').style.display = 'none';
+      document.getElementById('system-section').style.display = 'none';
+    }
+    
+    // Show Networks Section
+    function showNetworksSection() {
+      document.getElementById('users-section').style.display = 'none';
+      document.getElementById('networks-section').style.display = 'block';
+      document.getElementById('system-section').style.display = 'none';
+    }
+    
+    // Show System Section
+    function showSystemSection() {
+      document.getElementById('users-section').style.display = 'none';
+      document.getElementById('networks-section').style.display = 'none';
+      document.getElementById('system-section').style.display = 'block';
+    }
+    
+    // Initialize the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      refreshData();
+    });
+  </script>
+</body>
+</html>

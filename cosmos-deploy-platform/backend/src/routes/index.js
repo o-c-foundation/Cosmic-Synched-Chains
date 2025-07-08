@@ -6,6 +6,8 @@
 
 const express = require('express');
 const networkRoutes = require('./networkRoutes');
+const authRoutes = require('./authRoutes');
+const healthRoutes = require('./healthRoutes');
 const { ResourceNotFoundError } = require('../middlewares/errorHandler');
 
 const router = express.Router();
@@ -28,7 +30,9 @@ router.get('/docs', (req, res) => {
 });
 
 // Mount specific route modules
+router.use('/auth', authRoutes);
 router.use('/networks', networkRoutes);
+router.use('/health', healthRoutes);
 
 // Future route modules would be added here
 // router.use('/users', userRoutes);

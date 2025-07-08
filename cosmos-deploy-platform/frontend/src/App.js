@@ -11,6 +11,10 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
+import Features from './pages/Features';
+import Pricing from './pages/Pricing';
+import Documentation from './pages/Documentation';
+import Changelog from './pages/Changelog';
 import { NetworkProvider } from './context/NetworkContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -31,9 +35,30 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Auth-based redirect component
+const AuthRedirect = () => {
+  const { currentUser } = useAuth();
+  
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <Navigate to="/" replace />;
+};
+
 // Public layout - used for LandingPage, Login, Signup
 const PublicLayout = ({ children }) => {
   return children;
+};
+
+// Marketing layout - used for Features, Pricing, Documentation, Changelog
+// This wraps with Layout but doesn't require authentication
+const MarketingLayout = ({ children }) => {
+  return (
+    <Layout>
+      {children}
+    </Layout>
+  );
 };
 
 const App = () => {
@@ -46,15 +71,12 @@ const App = () => {
             <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
             <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
             <Route path="/signup" element={<PublicLayout><Signup /></PublicLayout>} />
+            <Route path="/features" element={<MarketingLayout><Features /></MarketingLayout>} />
+            <Route path="/pricing" element={<MarketingLayout><Pricing /></MarketingLayout>} />
+            <Route path="/documentation" element={<MarketingLayout><Documentation /></MarketingLayout>} />
+            <Route path="/changelog" element={<MarketingLayout><Changelog /></MarketingLayout>} />
             
             {/* Protected Routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            } />
             
             <Route path="/create-network" element={
               <ProtectedRoute>
@@ -105,10 +127,17 @@ const App = () => {
             } />
             
             {/* Catch all route - redirect to dashboard if authenticated, otherwise to landing page */}
-            <Route path="*" element={
+            <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Navigate to="/dashboard" replace />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
+            } />
+            
+            {/* Catch all route - redirect based on authentication */}
+            <Route path="*" element={
+              <AuthRedirect />
             } />
           </Routes>
         </Router>
